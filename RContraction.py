@@ -1,14 +1,19 @@
 import sys
-import pdb
-from random import randint, choice
+from random import choice
+
+def removeAll(l, v):
+  return [ item for item in l if item != v ]
+
+def countMinCut(resultDict):
+  return len((list(resultDict.values()))[0])
 
 def createVertexDict(f):
   vertexDict = {}
 
   for line in f:
     splitLine = line.split()
-    key = int(splitLine[0]) 
-    adjacentVertices = [ int(element) for element in splitLine[1:] ]
+    key = (int(splitLine[0]),) 
+    adjacentVertices = [ (int(element), ) for element in splitLine[1:] ]
     vertexDict[key] = adjacentVertices
 
   return vertexDict
@@ -16,76 +21,39 @@ def createVertexDict(f):
 def RContraction(originVertexDict):
 
   vertexDict = originVertexDict.copy()
-  verticesList = [ (element,) for element in vertexDict.keys() ]
   numVertices = len(vertexDict.keys())
-  vertexSum = len(vertexDict)
 
   while (numVertices > 2):
-    # pdb.set_trace()
-    try:
-      randomVertexTuple = choice(verticesList)     # randomVertexTuple - might be merged - a tuple
-      randomVertex = choice(randomVertexTuple)
-      randomDestination = choice(vertexDict[randomVertex])      # also vertex - both vertices constitute an edge
-    except:
-      e, m, tb = sys.exc_info()
-      pdb.post_mortem(tb)
-      
-    mergingVertexTuple = [ tup for tup in verticesList if randomDestination in tup ][0]      # dest vertex might be a part of merged vertex
-    newVertexTuple = tuple(set(randomVertexTuple + mergingVertexTuple))
+    # choose random edge
+    randomSuperVertex = choice(list(vertexDict.keys())) 
+    mergingVertex = choice(vertexDict[randomSuperVertex])
+    mergingSuperVertex = [ tup for tup in vertexDict.keys() if mergingVertex[0] in tup ][0]
+    resultingSuperVertex = randomSuperVertex + mergingSuperVertex
+    resultingAdjacentVertices = vertexDict[randomSuperVertex] + vertexDict[mergingSuperVertex]
     
-    # delete both merged vertices and add their sum to the vertices list
-    verticesList.remove(randomVertexTuple)
-    verticesList.remove(mergingVertexTuple)
-    verticesList.append(newVertexTuple)
+    # delete original vertices from dict
+    vertexDict.pop(randomSuperVertex, None)
+    vertexDict.pop(mergingSuperVertex, None)
+    # remove self-loops
+    for vertex in randomSuperVertex:
+      resultingAdjacentVertices = removeAll(resultingAdjacentVertices, (vertex, ))
+    for vertex in mergingSuperVertex:
+      resultingAdjacentVertices = removeAll(resultingAdjacentVertices, (vertex, ))
     
-    # delete links to second vertex (all values from tuple) from first vertex entry in vertexDict and vice-versa
-    for vertex1 in randomVertexTuple:
-      for vertex2 in mergingVertexTuple:
-        if vertex1 in vertexDict[vertex2]:
-          vertexDict[vertex2].remove(vertex1)
-        if vertex2 in vertexDict[vertex1]:
-          vertexDict[vertex1].remove(vertex2)
-
-        if not vertexDict[vertex2]:
-          print("Deleting vertex2 from verticesList: ")
-          emptyVertexTuples = []
-          emptyVertexTuples = [ tup for tup in verticesList if vertex2 in tup ]
-          if not emptyVertexTuples:
-            break
-          emptyVertexTuple = emptyVertexTuples[0]
-          emptyVertexList = list(emptyVertexTuple)
-          emptyVertexList.remove(vertex2)
-          newVertexTuple = tuple(emptyVertexList)
-          verticesList.remove(emptyVertexTuple)
-          verticesList.append(newVertexTuple)
-          print([item for item in verticesList if vertex2 in item])
-
-        if not vertexDict[vertex1]:
-          print("Deleting vertex2 from verticesList: ")
-          emptyVertexTuples = []
-          emptyVertexTuple = [ tup for tup in verticesList if vertex1 in tup ]
-          if not emptyVertexTuples:
-            break
-          emptyVertexTuple = emptyVertexTuples[0]
-          emptyVertexList = list(emptyVertexTuple)
-          emptyVertexList.remove(vertex1)
-          newVertexTuple = tuple(emptyVertexList)
-          verticesList.remove(emptyVertexTuple)
-          verticesList.append(newVertexTuple)
-          print([item for item in verticesList if vertex1 in item])
-
-
+    # add new super-vertex to dict
+    vertexDict[resultingSuperVertex] = resultingAdjacentVertices
+   
 
     numVertices = numVertices - 1
 
-  count = 0
-  for tailVertex in verticesList[0]:
-     count = count + len(vertexDict[tailVertex])
 
-  return (verticesList, vertexDict, count)
+  return vertexDict
+
+
 
 if __name__ == '__main__':
   filename = sys.argv[1]
   f = open(filename)
 
   vertexDict = createVertexDict(f)
+  resultDict = RContraction(vertexDict)
