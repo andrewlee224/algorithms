@@ -1,6 +1,10 @@
 import sys
 from random import choice
 
+# Random contraction algorithm
+# Use to find minimum cut of a graph
+# May need repeated tries to find the smallest cut
+
 def removeAll(l, v):
   return [ item for item in l if item != v ]
 
@@ -17,6 +21,7 @@ def createVertexDict(f):
     vertexDict[key] = adjacentVertices
 
   return vertexDict
+
 
 def RContraction(originVertexDict):
 
@@ -43,7 +48,6 @@ def RContraction(originVertexDict):
     # add new super-vertex to dict
     vertexDict[resultingSuperVertex] = resultingAdjacentVertices
    
-
     numVertices = numVertices - 1
 
 
