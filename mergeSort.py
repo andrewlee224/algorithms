@@ -38,10 +38,12 @@ def mergeSort(A):
 
   return D
 
-filename = sys.argv[1]
-file = open(filename)
+if __name__ == '__main__':
 
-numbers = [int(line.strip()) for line in file]
-sortedNumbers = mergeSort(numbers)
+  filename = sys.argv[1]
+  file = open(filename)
 
-print(sortedNumbers)
+  numbers = [int(line.strip()) for line in file]
+  sortedNumbers = mergeSort(numbers)
+
+  print(sortedNumbers)
