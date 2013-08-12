@@ -1,7 +1,7 @@
 import sys
 
 # MergeSort algorithm implementation
-# Running time O(n) = n*log(n)
+# Running time O(n*log(n))
 # Accepts a newline delimited list of integers and prints out the sorted
 # list to console.
 # Usage: mergeSort.py <filename>
