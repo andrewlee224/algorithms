@@ -54,10 +54,27 @@ def RContraction(originVertexDict):
   return vertexDict
 
 
+def batchContraction(fName, numRepeats):
+    vertexDict = createVertexDict(open(fName, 'r'))
+
+    minCutEdges = float('inf')
+    minCutDict = {}
+
+    for i in range(numRepeats):
+        print("Iteration {}".format(i))
+        resultDict = RContraction(vertexDict)
+        cutEdges = len(resultDict[resultDict.keys()[0]])
+        if cutEdges < minCutEdges:
+            minCutEdges = cutEdges
+            minCutDict = resultDict
+
+    return minCutDict, minCutEdges
+
 
 if __name__ == '__main__':
-  filename = sys.argv[1]
-  f = open(filename)
+    filename = sys.argv[1]
+    numRepeats = int(sys.argv[2])
 
-  vertexDict = createVertexDict(f)
-  resultDict = RContraction(vertexDict)
+    minCutDict, minCutEdges = batchContraction(filename, numRepeats)
+  
+    print("Minimum cut found with {} edges".format(minCutEdges))
